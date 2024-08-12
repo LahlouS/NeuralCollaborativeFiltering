@@ -11,7 +11,7 @@ To gain a solid understanding of recommendation systems, I decided to implement 
 
 Neural Collaborative Filtering (NCF) is a deep learning-based approach for recommendation systems, combining the strengths of matrix factorization and neural networks to model user-item interactions. In this implementation, I utilized the MovieLens dataset to train and evaluate the model, following the architecture and methodologies proposed in the original paper.
 
-[architecture](images/Capture d’écran 2024-08-12 à 11.46.43.png)
+[architecture](images/arch.png)
 
 ### Dataset
 

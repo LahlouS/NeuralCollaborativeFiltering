@@ -169,3 +169,5 @@ cython_debug/
 # dataset
 ml-latest-small/*.csv
 
+log/*.png
+
