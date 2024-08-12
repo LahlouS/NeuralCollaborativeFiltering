@@ -9,10 +9,10 @@ import utils.utils as utils
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 print(f'LOG: running on {device}')
 
-EPOCHS = 10
-batch_size = 8
+EPOCHS = 100
+batch_size = 128
 
-datamodule = MovieDataModule()
+datamodule = MovieDataModule(batch_size=batch_size)
 train_ds = datamodule.train_dataloader()
 test_ds = datamodule.test_dataloader()
 
@@ -44,11 +44,17 @@ for epchs in range(EPOCHS):
         optimizer.step()
         prog_bar.set_postfix(MSE=loss.item())
         loss_track.append(loss.item())
-        if idx % 500 == 0:
-            utils.plot_loss(loss_track, 'log/', f'loss{epchs}')
+    print(f'min loss epoch {epchs}:{min(loss_track)}')
+    utils.plot_loss(loss_track, 'log/', f'loss_e{epchs}')
 
     
-    model.eval()
+    # model.eval()
+    # print('EVALUATION MODE')
+    # prog_bar = tqdm(test_ds)
+    # for idx, (user_idx, item_idx, rating) in enumerate(prog_bar):
+
+
+    
     ###########################
         # TODO 
         # MAKE ALL THE EVAL LOGIC WITH METRICS AND STUFF

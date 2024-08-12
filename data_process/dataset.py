@@ -34,8 +34,8 @@ class MovieDataModule(object):
         self.unique_movie_set = set(self.rating_df['movieId'].unique())
         self.unique_user_set = set(self.rating_df['userId'].unique())
 
-        user_negative = self._negative_sample(self.rating_df)
-        self.rating_df = pd.concat([self.rating_df, user_negative], axis=0, ignore_index=True)
+        # user_negative = self._negative_sample(self.rating_df)
+        # self.rating_df = pd.concat([self.rating_df, user_negative], axis=0, ignore_index=True)
 
 
         self.rating_df = self._reindex(self.rating_df)
