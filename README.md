@@ -5,13 +5,13 @@ To gain a solid understanding of recommendation systems, I decided to implement 
 ### Implementation Details ==IN PROGRESS==
 
 - **Framework**: PyTorch
-- **Dataset**: [MovieLens Dataset](link to the dataset)
+- **Dataset**: [MovieLens Dataset](http://movielens.org)
 
 ### Overview
 
 Neural Collaborative Filtering (NCF) is a deep learning-based approach for recommendation systems, combining the strengths of matrix factorization and neural networks to model user-item interactions. In this implementation, I utilized the MovieLens dataset to train and evaluate the model, following the architecture and methodologies proposed in the original paper.
 
-[architecture](images/arch.png)
+![architecture](images/arch.png)
 
 ### Dataset
 
