@@ -34,15 +34,11 @@ class MovieDataModule(object):
         self.unique_movie_set = set(self.rating_df['movieId'].unique())
         self.unique_user_set = set(self.rating_df['userId'].unique())
 
-        print('len(self.unique_movie_set) --> ', len(self.unique_movie_set))
-        print('len(self.unique_user_set) --> ', len(self.unique_user_set))
-        print('len(self.rating_df) --> ', len(self.rating_df))
-
         # user_negative = self._negative_sample(self.rating_df)
         # self.rating_df = pd.concat([self.rating_df, user_negative], axis=0, ignore_index=True)
 
 
-        self.rating_df = self._reindex(self.rating_df)
+        # self.rating_df = self._reindex(self.rating_df)
 
 
         self.train_ds, self.test_ds = self._create_train_test(self.rating_df, train_proportion=split)
