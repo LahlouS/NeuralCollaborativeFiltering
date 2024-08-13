@@ -173,3 +173,5 @@ log/*.png
 
 checkpoints/mf_weights.ckpt
 checkpoints/mlp_weights.ckpt
+
+preds/*
