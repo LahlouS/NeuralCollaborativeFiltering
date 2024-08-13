@@ -16,8 +16,6 @@ class GeneralisedMatrixFactorization(nn.Module):
         self.act = nn.Sigmoid()
     
     def forward(self, c_idx, u_idx):
-        # c_idx = torch.LongTensor(c_idx)
-        # u_idx = torch.LongTensor(u_idx)
 
         c_embed = self.c_embed(c_idx)
         u_embed = self.u_embed(u_idx)
@@ -49,8 +47,6 @@ class MultiLayerPerceptron(nn.Module):
         self.sig = nn.Sigmoid()
 
     def forward(self, c_idx, u_idx):
-        # c_idx = torch.LongTensor(c_idx)
-        # u_idx = torch.LongTensor(u_idx)
 
         c_embed = self.c_embed(c_idx)
         u_embed = self.u_embed(u_idx)

@@ -45,16 +45,10 @@ for epchs in range(EPOCHS):
         prog_bar.set_postfix(MSE=loss.item())
         loss_track.append(loss.item())
     print(f'min loss epoch {epchs}:{min(loss_track)}')
-    utils.plot_loss(loss_track, 'log/', f'loss_e{epchs}')
+    utils.plot_loss({ 'NeuMF': loss_track }, 'log/', f'loss_e{epchs}')
 
     
-    # model.eval()
-    # print('EVALUATION MODE')
-    # prog_bar = tqdm(test_ds)
-    # for idx, (user_idx, item_idx, rating) in enumerate(prog_bar):
-
-
-    
+    model.eval()
     ###########################
         # TODO 
         # MAKE ALL THE EVAL LOGIC WITH METRICS AND STUFF

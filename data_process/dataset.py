@@ -44,11 +44,12 @@ class MovieDataModule(object):
 
         self.rating_df = self._reindex(self.rating_df)
 
-        if device == 'mps':
-            print('LOG: device == mps converting to float32')
-            self.rating_df['rating'] = self.rating_df['rating'].astype(np.float32)
 
         self.train_ds, self.test_ds = self._create_train_test(self.rating_df, train_proportion=split)
+        if device == 'mps':
+            print('LOG: device == mps converting to float32')
+            self.train_ds['rating'] = self.train_ds['rating'].astype(np.float32)
+            self.test_ds['rating'] = self.test_ds['rating'].astype(np.float32)
 
 
     # def _create_train_test(self, df, train_proportion):
@@ -58,7 +59,6 @@ class MovieDataModule(object):
         invert_attr = "movieId" if test_attr == "userId" else "userId"
         for id, group in groups:
             if id not in train[test_attr]:
-                print('-----> ', test_attr, 'vs', invert_attr)
                 inv_id, ra, ti = list(group[invert_attr]), list(group['rating']), list(group['timestamp'])
 
                 new_row = pd.DataFrame({test_attr: [id], invert_attr: [inv_id[0]], 'rating': [ra[0]], 'timestamp': [ti[0]]})
