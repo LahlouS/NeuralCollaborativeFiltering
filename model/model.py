@@ -13,7 +13,7 @@ class GeneralisedMatrixFactorization(nn.Module):
         self.u_embed = nn.Embedding(self.u_len, embed_size)
 
         # you put identity function and bam you have simple GM
-        self.act = nn.Sigmoid()
+        self.act = nn.Identity()
     
     def forward(self, c_idx, u_idx):
 
@@ -44,7 +44,7 @@ class MultiLayerPerceptron(nn.Module):
                 self.mlp.append(nn.ReLU())
         self.mlp = nn.Sequential(*self.mlp)    
         
-        self.sig = nn.Sigmoid()
+        self.sig = nn.ReLU()
 
     def forward(self, c_idx, u_idx):
 
@@ -59,7 +59,7 @@ class MultiLayerPerceptron(nn.Module):
 
 
 class NeuMF(nn.Module):
-    def __init__(self, c_len, u_len, embed_size, layers=[64, 32, 16, 8, 4, 1]):
+    def __init__(self, c_len, u_len, embed_size, layers=[64, 32, 16, 8, 4, 1], gmf_weights=None, mlp_weights=None):
         super().__init__()
         
         self.c_len = c_len
@@ -69,9 +69,17 @@ class NeuMF(nn.Module):
 
         self.mlp = MultiLayerPerceptron(self.c_len, self.u_len, self.embed_size, self.layers)
         self.gmf = GeneralisedMatrixFactorization(self.c_len, self.u_len, self.embed_size)
+        if gmf_weights is not None:
+            print('LOG: loading pre-trained GMF weights')
+            state = torch.load(gmf_weights, weights_only=True)
+            self.gmf.load_state_dict(state)
+        if mlp_weights is not None:
+            print('LOG: loading pre-trained MLP weights')
+            state = torch.load(mlp_weights, weights_only=True)
+            self.mlp.load_state_dict(state)
 
         self.final_linear = nn.Linear(2, 1)
-        self.sig = nn.Sigmoid()
+        self.sig = nn.ReLU()
     
     def forward(self, c_idx, u_idx):
         mlp = self.mlp(c_idx, u_idx)
