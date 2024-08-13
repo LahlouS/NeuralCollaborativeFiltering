@@ -47,8 +47,58 @@ class MovieDataModule(object):
         self.train_ds, self.test_ds = self._create_train_test(self.rating_df, train_proportion=split)
 
 
+    # def _create_train_test(self, df, train_proportion):
+    #     return train_test_split(df, test_size=(1 - train_proportion), train_size=train_proportion)
+    
+    def _sort_group(self, groups, train, test, test_attr):
+        invert_attr = "movieId" if test_attr == "userId" else "userId"
+        for id, group in groups:
+            if id not in train[test_attr]:
+                inv_id, ra, ti = list(group[invert_attr]), list(group['rating']), list(group['timestamp'])
+
+                new_row = pd.DataFrame({test_attr: [id], invert_attr: [inv_id[0]], 'rating': [ra[0]], 'timestamp': [ti[0]]})
+                train = pd.concat([train, new_row], ignore_index=True)
+                mask = (test[test_attr] == id) & (test[invert_attr] == inv_id[0])
+                test = test[~mask]
+        return train, test
+
+
     def _create_train_test(self, df, train_proportion):
-        return train_test_split(df, test_size=(1 - train_proportion), train_size=train_proportion)
+        train, test = train_test_split(df, test_size=(1 - train_proportion), train_size=train_proportion)
+        print('DEBUG original ---->', len(train), len(test))
+        test_users = (
+            test.groupby('userId')[['movieId', 'rating', 'timestamp']]
+        )
+        # for user_id, group in test_users:
+        #     if user_id not in train['userId']:
+        #         m_id, ra, ti = list(group['movieId']), list(group['rating']), list(group['timestamp'])
+
+        #         new_row = pd.DataFrame({'userId': [user_id], 'movieId': [m_id[0]], 'rating': [ra[0]], 'timestamp': [ti[0]]})
+        #         train = pd.concat([train, new_row], ignore_index=True)
+        #         mask = (test['userId'] == user_id) & (test['movieId'] == m_id[0])
+        #         test = test[~mask]
+
+        train, test = self._sort_group(test_users, train, test, "userId")
+        
+        print('DEBUG user sorted ---->', len(train), len(test))
+        
+        test_item = (
+            test.groupby('movieId')[['userId', 'rating', 'timestamp']]
+        )
+        train, test = self._sort_group(test_item, train, test, "movieId")
+        
+        print('DEBUG item sorted ---->', len(train), len(test))
+
+        # for movie_id, group in test_item:
+        #     if movie_id not in train['movieId']:
+        #         u_id, ra, ti = list(group['userId']), list(group['rating']), list(group['timestamp'])
+
+        #         new_row = pd.DataFrame({'movieId': [movie_id], 'userId': [u_id[0]], 'rating': [ra[0]], 'timestamp': [ti[0]]})
+        #         train = pd.concat([train, new_row], ignore_index=True)
+        #         mask = (test['movieId'] == movie_id) & (test['userId'] == u_id[0])
+        #         test = test[~mask]
+
+        return train, test
     
     def _reindex(self, ratings):
 
