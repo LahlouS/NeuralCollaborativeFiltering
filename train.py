@@ -1,16 +1,18 @@
+import os
 import sys
 import torch
 from data_process.dataset import MovieDataModule
 from model.model import NeuMF
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import utils.utils as utils 
+import utils.utils as utils
+import pandas as pd
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 print(f'LOG: running on {device}')
 
-EPOCHS = 100
-batch_size = 128
+EPOCHS = 400
+batch_size = 512
 
 datamodule = MovieDataModule(batch_size=batch_size)
 train_ds = datamodule.train_dataloader()
@@ -19,7 +21,10 @@ test_ds = datamodule.test_dataloader()
 model = NeuMF(c_len=len(datamodule.unique_movie_set),
                 u_len=len(datamodule.unique_user_set),
                 embed_size=32, 
-                layers=[64, 32, 16, 8, 4, 1])
+                layers=[64, 32, 16, 8, 4, 1],
+                mlp_weights='checkpoints/mlp_weights.ckpt',
+                gmf_weights='checkpoints/mf_weights.ckpt')
+
 model = model.to(device)
 
 learning_rate = 0.0001 
@@ -49,7 +54,25 @@ for epchs in range(EPOCHS):
 
     
     model.eval()
-    ###########################
-        # TODO 
-        # MAKE ALL THE EVAL LOGIC WITH METRICS AND STUFF
+    prog_bar = tqdm(test_ds)
+    output_test_df = pd.DataFrame(columns=['userId', 'movieId', 'label', 'preds'])
+    for idx, (user_idx, item_idx, rating) in enumerate(prog_bar):
+        user_idx, item_idx, rating = user_idx.to(device), item_idx.to(device), rating.to(device)
+        pred_rating = model(item_idx, user_idx)
+        pred_rating = pred_rating.squeeze(1)
+        loss_test = loss_function(pred_rating, rating)
+        df = pd.DataFrame({
+            'userId': user_idx.detach().cpu(), 
+            'movieId': item_idx.detach().cpu(), 
+            'label': rating.detach().cpu(),
+            'preds': pred_rating.detach().cpu()
+        })
+        output_test_df = pd.concat([output_test_df, df])
+        path = './preds/'
+        filename = f'preds_e_{epchs}.csv'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        output_test_df.to_csv(path + filename)
 
+path = './checkpoints/'
+utils.save_model_state(model, path, 'mf_weights.ckpt')

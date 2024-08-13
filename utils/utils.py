@@ -42,4 +42,4 @@ def save_model_state(model, path, filename):
         os.makedirs(path)
     filename = path + filename
     print('saving model to', filename)
-    torch.save(model.state_dict, filename)
+    torch.save(model.state_dict(), filename)
