@@ -173,5 +173,6 @@ log/*.png
 
 checkpoints/mf_weights.ckpt
 checkpoints/mlp_weights.ckpt
+checkpoints/neumf*
 
 preds/*
