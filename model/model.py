@@ -20,6 +20,7 @@ class GeneralisedMatrixFactorization(nn.Module):
         c_embed = self.c_embed(c_idx)
         u_embed = self.u_embed(u_idx)
 
+
         dot = (c_embed * u_embed).sum(dim=1).unsqueeze(dim=1)
 
         return self.act(dot)
@@ -47,9 +48,9 @@ class MultiLayerPerceptron(nn.Module):
         self.sig = nn.ReLU()
 
     def forward(self, c_idx, u_idx):
-
         c_embed = self.c_embed(c_idx)
         u_embed = self.u_embed(u_idx)
+
 
         c_u_embed = torch.cat((c_embed, u_embed), dim=1)
 

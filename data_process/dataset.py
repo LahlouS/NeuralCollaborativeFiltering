@@ -17,7 +17,8 @@ class MovieDS(Dataset):
         
     
     def __getitem__(self, idx):
-        return self.df_user.iloc[idx], self.df_movie.iloc[idx], self.df_rating.iloc[idx]
+        ratings = self.df_rating.iloc[idx]
+        return self.df_user.iloc[idx], self.df_movie.iloc[idx], ratings
 
     def __len__(self):
         return len(self.df_user)
@@ -25,7 +26,7 @@ class MovieDS(Dataset):
 
 
 class MovieDataModule(object):
-    def __init__(self, path_to_rating="ml-latest-small/ratings.csv", batch_size=8, split=0.5, device='mps'):
+    def __init__(self, path_to_rating="ml-latest-small/ratings.csv", batch_size=8, split=0.5, device='cuda'):
         self.path_to_rating = path_to_rating
         self.batch_size = batch_size
         
@@ -38,7 +39,7 @@ class MovieDataModule(object):
         # self.rating_df = pd.concat([self.rating_df, user_negative], axis=0, ignore_index=True)
 
 
-        # self.rating_df = self._reindex(self.rating_df)
+        self.rating_df = self._reindex(self.rating_df)
 
 
         self.train_ds, self.test_ds = self._create_train_test(self.rating_df, train_proportion=split)
@@ -46,6 +47,7 @@ class MovieDataModule(object):
             print('LOG: device == mps converting to float32')
             self.train_ds['rating'] = self.train_ds['rating'].astype(np.float32)
             self.test_ds['rating'] = self.test_ds['rating'].astype(np.float32)
+
 
 
     # def _create_train_test(self, df, train_proportion):

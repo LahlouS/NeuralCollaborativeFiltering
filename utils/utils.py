@@ -43,3 +43,8 @@ def save_model_state(model, path, filename):
     filename = path + filename
     print('saving model to', filename)
     torch.save(model.state_dict(), filename)
+
+def to_csv(pd_df, path, filename):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    pd_df.to_csv(path + filename)

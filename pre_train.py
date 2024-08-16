@@ -8,11 +8,13 @@ import matplotlib.pyplot as plt
 import utils.utils as utils 
 
 print('*** LOG: pre-training MF and MLP ***')
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+condition = torch.cuda.is_available()
+print('LOG -------->', condition)
+device = torch.device("cuda" if condition else "cpu")
 print(f'LOG: running on {device}')
 
-EPOCHS = 100
-batch_size = 256
+EPOCHS = 150
+batch_size = 512
 
 datamodule = MovieDataModule(batch_size=batch_size)
 train_ds = datamodule.train_dataloader()
@@ -25,7 +27,7 @@ model_mlp = MultiLayerPerceptron(c_len=len(datamodule.unique_movie_set), u_len=l
 model_mf = model_mf.to(device)
 model_mlp = model_mlp.to(device)
 
-learning_rate = 0.0001 
+learning_rate = 0.001 
 
 loss_function = torch.nn.MSELoss()
 
@@ -42,14 +44,14 @@ for epchs in range(EPOCHS):
 
     prog_bar = tqdm(train_ds)
     for idx, (user_idx, item_idx, rating) in enumerate(prog_bar):
-        user_idx, item_idx, rating = user_idx.to(device), item_idx.to(device), rating.to(device)
+        user_idx, item_idx, rating = user_idx.to(device), item_idx.to(device), rating.type(torch.FloatTensor).to(device)
 
         optimizer_mf.zero_grad()
         optimizer_mlp.zero_grad()
         
         pred_rating_mf = model_mf(item_idx, user_idx)
         pred_rating_mlp = model_mlp(item_idx, user_idx)
-
+        
         loss_mf = loss_function(pred_rating_mf.squeeze(1), rating)
         loss_mlp = loss_function(pred_rating_mlp.squeeze(1), rating)
 
@@ -71,7 +73,4 @@ path = './checkpoints/'
 utils.save_model_state(model_mf, path, 'mf_weights.ckpt')
 utils.save_model_state(model_mlp, path, 'mlp_weights.ckpt')
 
-    ###########################
-        # TODO 
-        # MAKE ALL THE EVAL LOGIC WITH METRICS AND STUFF
 
